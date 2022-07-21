@@ -10,3 +10,5 @@ Elixir.ODS_Contracts/ResponseWrapper/obj/
 Elixir.ODS_Contracts/ODS_Contracts.Tests/bin/
 Elixir.ODS_Contracts/ODS_Contracts.Tests/obj/
 Elixir.ODS_Contracts/Elixir.ODS_Contracts.API/Elixir.ODS_Contracts.API.csproj.user
+obj
+bin

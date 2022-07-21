@@ -10,83 +10,90 @@ namespace NewsArticles
     {
         static void Main(string[] args)
         {
+            var allGroupedArticles = new GroupedArticles();
+            var dtFormat = new System.Globalization.DateTimeFormatInfo();
+
             var newsArticles = GetNewsArticles();
+            var groupedByDate = GroupByDate(newsArticles);
 
-            List<GroupedArticles> groupedArticles = new List<GroupedArticles>();
-            var gropedBySite = newsArticles.GroupBy(x => x.NewsSite)
-                                           .ToList();
+            groupedByDate.ForEach(x => allGroupedArticles.groupedArticleItems
+                                                         .AddRange
+                                                         (
+                                                            GroupByNewsSite(x.NewsSite, x.Month, x.Year)
+                                                         ));
 
-            groupedArticles.ForEach(x => groupedArticles.Add(new GroupedArticles
+            foreach (var groupedArticle in allGroupedArticles.groupedArticleItems)
             {
-                NewsSite = x.NewsSite,
-                Month = x.Month,
-                Year = x.Year,
-                Count = 
-            }));
-
-            List<IGrouping<int, Article>> groupedByMonth = new List<IGrouping<int, Article>>();
-            foreach (var group in gropedBySite)
-            {
-                groupedByMonth = group.GroupBy(x => x.Month).ToList();
-                groupedArticles.AddRange(new GroupedArticles
-                {
-                    NewsSite = group.Key,
-                    Month = 
-                });
+                Console.WriteLine($"{dtFormat.GetMonthName(groupedArticle.Month)} {groupedArticle.Year} {groupedArticle.NewsSite} {groupedArticle.Count}");
             }
-
-
-
         }
 
         private static List<Article> GetNewsArticles()
         {
-            List<Article> articles = new List<Article>();
-
             var client = new RestClient("https://api.spaceflightnewsapi.net/v3/articles?_limit=100");
             var request = new RestRequest();
             var response = client.Get(request);
-            var result = JsonConvert.DeserializeObject<List<RawData>>(response.Content);
+            var result = JsonConvert.DeserializeObject<List<Article>>(response.Content);
 
-            result.ForEach(x => articles.Add(Article.Map(x.newsSite, x.publishedAt)));
-
-            return articles;
+            return result;
         }
-    }
 
-    public class RawData
-    {
-        public string newsSite { get; set; }
-        public string publishedAt { get; set; }
+        private static List<NewsSitePerMonth> GroupByDate(List<Article> articles)
+        {
+            var result = articles.GroupBy(x => new { x.PublishedAt.Year, x.PublishedAt.Month })
+                                 .Select(y => new NewsSitePerMonth
+                                 {
+                                     Month = y.Key.Month,
+                                     Year = y.Key.Year,
+                                     NewsSite = y.Select(x => x.NewsSite).ToList()
+                                 }).ToList();
+
+            return result;
+        }
+
+        private static List<GroupedArticleItem> GroupByNewsSite(List<string> newsSite, int month, int year)
+        {
+            var result = newsSite.GroupBy(x => x)
+                                 .Select(y => new GroupedArticleItem
+                                 {
+                                     NewsSite = y.Key,
+                                     Year = year,
+                                     Month = month,
+                                     Count = y.Count()
+                                 }).ToList();
+
+            return result;
+        }
     }
 
     public class Article
     {
         public string NewsSite { get; set; }
+        public DateTime PublishedAt { get; set; }
+    }
+    public class NewsSitePerMonth
+    {
+        public List<string> NewsSite { get; set; }
         public int Month { get; set; }
         public int Year { get; set; }
-        public static Article Map(string newsSite, string publishedAt)
-        {
-            var date = publishedAt.Split('-');
-            var year = Convert.ToInt32(date[0]);
-            var month = Convert.ToInt32(date[1]);
-
-            return new Article
-            {
-                NewsSite = newsSite,
-                Month = month,
-                Year = year
-            };
-
-        }
-
     }
 
-    public class GroupedArticles
+    public class GroupedArticleItem
     {
         public string NewsSite { get; set; }
         public int Month { get; set; }
         public int Year { get; set; }
         public int Count { get; set; }
     }
+
+    public class GroupedArticles
+    {
+        public List<GroupedArticleItem> groupedArticleItems { get; set; }
+
+        public GroupedArticles()
+        {
+            groupedArticleItems = new List<GroupedArticleItem>();
+        }
+    }
+
 }
