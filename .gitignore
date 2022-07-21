@@ -1,0 +1,12 @@
+.vs/
+Elixir.ODS_Contracts/Elixir.ODS_Contracts.API/obj/
+Elixir.ODS_Contracts/Elixir.ODS_Contract.Domain/bin/
+Elixir.ODS_Contracts/Elixir.ODS_Contract.Domain/obj/
+Elixir.ODS_Contracts/Elixir.ODS_Contracts.API/bin/
+Elixir.ODS_Contracts/Elixir.ODS_Contracts.Tests/bin/
+Elixir.ODS_Contracts/Elixir.ODS_Contracts.Tests/obj/
+Elixir.ODS_Contracts/ResponseWrapper/bin/
+Elixir.ODS_Contracts/ResponseWrapper/obj/
+Elixir.ODS_Contracts/ODS_Contracts.Tests/bin/
+Elixir.ODS_Contracts/ODS_Contracts.Tests/obj/
+Elixir.ODS_Contracts/Elixir.ODS_Contracts.API/Elixir.ODS_Contracts.API.csproj.user
